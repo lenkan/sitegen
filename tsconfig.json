@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "noEmit": true,
+    "module": "NodeNext",
+    "jsx": "react-jsx",
+    "allowImportingTsExtensions": true,
+    "outDir": "dist"
+  },
+  "ts-node": {
+    "esm": true,
+    "swc": true
+  }
+}
