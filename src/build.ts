@@ -33,6 +33,14 @@ const renderServerPage = (body: string, props: TemplateProps) => `
 </html>
 `;
 
+async function loadModule(pathname: string) {
+  const mod = (await import(pathname + "?" + Date.now())) as {
+    default: { routes: Record<string, { title?: string }>; component: any };
+  };
+
+  return mod;
+}
+
 export async function build(input: string, outputDir: string, args: Record<string, string | boolean | undefined>) {
   await fs.mkdir(outputDir, { recursive: true }).catch(() => {});
 
@@ -59,16 +67,21 @@ export async function build(input: string, outputDir: string, args: Record<strin
         name: "html",
         setup: async (build) => {
           build.onEnd(async (result) => {
-            await Promise.all(result.outputFiles.map((file) => writeFile(file.path, file.contents)));
+            await Promise.all(
+              result.outputFiles.map(async (file) => {
+                await writeFile(file.path, file.contents);
+                console.log("Wrote %s", file.path);
+              })
+            );
 
             for (const bundle of result.outputFiles.filter((file) => file.path.endsWith(".js"))) {
-              const mod = (await import(bundle.path)) as {
-                default: { routes: Record<string, { title?: string }>; component: any };
-              };
+              const mod = await loadModule(bundle.path);
 
               for (const [pathname, { title = "Lenkan" }] of Object.entries(mod.default.routes)) {
+                const htmlfile = path.join(outputDir, pathname === "/" ? "index" : pathname) + ".html";
+
                 await writeFile(
-                  path.join(outputDir, pathname === "/" ? "index" : pathname) + ".html",
+                  htmlfile,
                   renderServerPage(
                     renderToString(
                       createElement(mod.default.component, {
@@ -86,6 +99,8 @@ export async function build(input: string, outputDir: string, args: Record<strin
                     }
                   )
                 );
+
+                console.log("Wrote %s", htmlfile);
               }
 
               await esbuild.build({
