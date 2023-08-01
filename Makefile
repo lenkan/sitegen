@@ -12,6 +12,9 @@ build:
 publish:
 	npm publish --access=public
 
+lint:
+	npx eslint src
+
 clean:
 	rm -rf node_modules/
 	rm -rf dist/

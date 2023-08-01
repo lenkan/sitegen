@@ -1,4 +1,4 @@
-import { createElement } from "react";
+import { ComponentClass, FunctionComponent, createElement } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { URLPattern } from "urlpattern-polyfill";
 
@@ -8,7 +8,7 @@ export interface Routes {
 
 export interface Route {
   title: string;
-  component: any;
+  component: FunctionComponent;
 }
 
 export interface AppProps {
@@ -16,7 +16,7 @@ export interface AppProps {
 }
 
 export interface Application {
-  component: any;
+  component: FunctionComponent | ComponentClass;
   routes: Routes;
 }
 
@@ -26,7 +26,7 @@ export function render(routes: Routes) {
       const pattern = new URLPattern(path, props.location.origin);
 
       if (pattern.test(props.location.pathname, props.location.origin)) {
-        return route.component();
+        return createElement(route.component, {});
       }
     }
 

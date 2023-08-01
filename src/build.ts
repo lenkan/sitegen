@@ -1,8 +1,7 @@
-import { program } from "commander";
 import esbuild from "esbuild";
 import fs, { writeFile } from "fs/promises";
 import path from "path";
-import { createElement } from "react";
+import { ComponentClass, FunctionComponent, createElement } from "react";
 import { renderToString } from "react-dom/server";
 
 interface TemplateProps {
@@ -33,12 +32,18 @@ const renderServerPage = (body: string, props: TemplateProps) => `
 </html>
 `;
 
-async function loadModule(pathname: string) {
-  const mod = (await import(pathname + "?" + Date.now())) as {
-    default: { routes: Record<string, { title?: string }>; component: any };
-  };
+interface AppModule {
+  component: FunctionComponent<AppComponentProps> | ComponentClass<AppComponentProps>;
+  routes: Record<string, { title?: string }>;
+}
 
-  return mod;
+interface AppComponentProps {
+  location: { pathname: string; origin: string };
+}
+
+async function loadModule(pathname: string): Promise<AppModule> {
+  const mod = (await import(pathname + "?" + Date.now())) as { default: AppModule };
+  return mod.default;
 }
 
 export async function build(input: string, outputDir: string, args: Record<string, string | boolean | undefined>) {
@@ -77,14 +82,14 @@ export async function build(input: string, outputDir: string, args: Record<strin
             for (const bundle of result.outputFiles.filter((file) => file.path.endsWith(".js"))) {
               const mod = await loadModule(bundle.path);
 
-              for (const [pathname, { title = "Lenkan" }] of Object.entries(mod.default.routes)) {
+              for (const [pathname, { title = "Lenkan" }] of Object.entries(mod.routes)) {
                 const htmlfile = path.join(outputDir, pathname === "/" ? "index" : pathname) + ".html";
 
                 await writeFile(
                   htmlfile,
                   renderServerPage(
                     renderToString(
-                      createElement(mod.default.component, {
+                      createElement(mod.component, {
                         location: { pathname, origin: "https://example.com" },
                       })
                     ),
