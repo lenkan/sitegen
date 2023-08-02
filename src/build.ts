@@ -3,34 +3,7 @@ import fs, { writeFile } from "fs/promises";
 import path from "path";
 import { ComponentClass, FunctionComponent, createElement } from "react";
 import { renderToString } from "react-dom/server";
-
-interface TemplateProps {
-  styles: string[];
-  scripts: string[];
-  title: string;
-}
-
-function renderStyle(script: string) {
-  return `<link rel="stylesheet" href="${script}" />`;
-}
-
-function renderScript(script: string) {
-  return `<script async src="${script}"></script>`;
-}
-
-const renderServerPage = (body: string, props: TemplateProps) => `
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>${props.title}</title>
-    ${props.styles.map(renderStyle).join("\n")}
-    ${props.scripts.map(renderScript).join("\n")}
-  </head>
-  <body>
-    <div id="root">${body}</div>
-  </body>
-</html>
-`;
+import { renderServerPage } from "./render";
 
 interface AppModule {
   component: FunctionComponent<AppComponentProps> | ComponentClass<AppComponentProps>;
@@ -59,6 +32,7 @@ export async function build(input: string, outputDir: string, args: Record<strin
     splitting: false,
     loader: {
       ".jpeg": "file",
+      ".svg": "file",
       ".module.css": "local-css",
     },
     define: {

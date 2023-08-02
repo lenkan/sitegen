@@ -12,7 +12,7 @@ export interface Route {
 }
 
 export interface AppProps {
-  location: Location;
+  location: Pick<Location, "pathname" | "origin">;
 }
 
 export interface Application {
