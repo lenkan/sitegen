@@ -39,6 +39,7 @@ export async function build(input: string, outputDir: string, args: Record<strin
       "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV ?? "development"),
     },
     entryPoints: [input],
+    entryNames: "[dir]/[name]-[hash]",
     outdir: outputDir,
     write: false,
     plugins: [
