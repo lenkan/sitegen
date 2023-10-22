@@ -1,6 +1,6 @@
 {
   "name": "@lenkan/sitegen",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "",
   "main": "dist/api.cjs",
   "module": "dist/api.mjs",
