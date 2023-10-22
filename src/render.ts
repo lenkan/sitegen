@@ -10,6 +10,7 @@ export interface TemplateProps {
   styles: string[];
   scripts: string[];
   title: string;
+  favicon?: string;
 }
 
 export function renderServerPage(body: string, props: TemplateProps) {
@@ -17,6 +18,7 @@ export function renderServerPage(body: string, props: TemplateProps) {
 <html>
   <head>
     <title>${props.title}</title>
+    ${props.favicon ? `<link rel="icon" href="${props.favicon}">` : ""}
     ${props.styles.map(renderStyle).join("\n")}
     ${props.scripts.map(renderScript).join("\n")}
   </head>

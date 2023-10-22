@@ -7,7 +7,7 @@ import { renderServerPage } from "./render";
 
 interface AppModule {
   component: FunctionComponent<AppComponentProps> | ComponentClass<AppComponentProps>;
-  routes: Record<string, { title?: string }>;
+  routes: Record<string, { title?: string; favicon?: string }>;
 }
 
 interface AppComponentProps {
@@ -57,7 +57,7 @@ export async function build(input: string, outputDir: string, args: Record<strin
             for (const bundle of result.outputFiles.filter((file) => file.path.endsWith(".js"))) {
               const mod = await loadModule(bundle.path);
 
-              for (const [pathname, { title = "Lenkan" }] of Object.entries(mod.routes)) {
+              for (const [pathname, { title = "Lenkan", favicon }] of Object.entries(mod.routes)) {
                 const htmlfile = path.join(outputDir, pathname === "/" ? "index" : pathname) + ".html";
 
                 await writeFile(
@@ -76,6 +76,7 @@ export async function build(input: string, outputDir: string, args: Record<strin
                         .filter((file) => file.path.endsWith(".js"))
                         .map((file) => path.relative(outputDir, file.path)),
                       title: title ?? "Lenkan",
+                      favicon,
                     }
                   )
                 );
