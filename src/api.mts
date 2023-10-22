@@ -8,6 +8,7 @@ export interface Routes {
 
 export interface Route {
   title: string;
+  favicon?: string;
   component: FunctionComponent;
 }
 
