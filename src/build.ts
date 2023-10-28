@@ -14,7 +14,25 @@ async function loadModule(pathname: string): Promise<AppModule> {
 export interface BuildArgs {
   watch?: boolean;
   outdir: string;
-  outbase: string;
+  inputdir: string;
+}
+
+async function findInputs(dir: string): Promise<string[]> {
+  const files: string[] = [];
+
+  const entries = await fs.readdir(dir, { recursive: true, withFileTypes: true });
+
+  for (const entry of entries) {
+    const ext = path.extname(entry.name);
+    if (entry.isFile() && [".tsx", ".ts", ".md", ".mdx"].includes(ext)) {
+      files.push(path.join(dir, entry.name));
+    } else if (entry.isDirectory()) {
+      const children = await findInputs(path.join(dir, entry.name));
+      files.push(...children);
+    }
+  }
+
+  return files;
 }
 
 function replaceExtention(name: string, extension: string) {
@@ -31,7 +49,8 @@ function findBundle(entryPoint: string, metafile: esbuild.Metafile) {
   return null;
 }
 
-export async function build(inputs: string[], args: BuildArgs) {
+export async function build(args: BuildArgs) {
+  const inputs = await findInputs(args.inputdir);
   await fs.mkdir(args.outdir, { recursive: true }).catch(() => {});
 
   const options: esbuild.BuildOptions = {
@@ -52,7 +71,7 @@ export async function build(inputs: string[], args: BuildArgs) {
     entryPoints: inputs,
     entryNames: "[dir]/[name]-[hash]",
     outdir: args.outdir,
-    outbase: args.outbase,
+    outbase: args.inputdir,
     write: false,
     plugins: [
       {
@@ -78,7 +97,7 @@ export async function build(inputs: string[], args: BuildArgs) {
 
               const htmlfile = path.join(
                 args.outdir,
-                path.relative(args.outbase, replaceExtention(entryPoint, ".html"))
+                path.relative(args.inputdir, replaceExtention(entryPoint, ".html"))
               );
               await mkdir(path.dirname(htmlfile), { recursive: true });
 

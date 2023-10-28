@@ -7,10 +7,9 @@ program
   .command("build")
   .option("-w, --watch", "Watch mode", false)
   .requiredOption("-o, --outdir <output-dir>", "Output directory", "dist")
-  .requiredOption("--outbase <outbase>", "Output base directory")
-  .argument("<input...>")
-  .action(async (input: string[], options) => {
-    await build(input, options);
+  .requiredOption("-i, --inputdir <input-dir>", "Input directory", "src/pages")
+  .action(async (options) => {
+    await build(options);
   });
 
 program
