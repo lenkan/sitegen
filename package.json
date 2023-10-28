@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/api.cjs",
   "module": "dist/api.mjs",
-  "types": "dist/api.d.mts",
+  "types": "dist/api.d.ts",
   "private": false,
   "bin": {
     "sitegen": "dist/cli.js"
