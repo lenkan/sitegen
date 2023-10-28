@@ -3,7 +3,7 @@ function renderStyle(script: string) {
 }
 
 function renderScript(script: string) {
-  return `<script async src="${script}"></script>`;
+  return `<script async src="${script}" type="module"></script>`;
 }
 
 export interface TemplateProps {

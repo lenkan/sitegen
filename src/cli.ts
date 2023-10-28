@@ -5,11 +5,12 @@ import { serve } from "./serve";
 
 program
   .command("build")
-  .argument("<input>")
-  .argument("<output-dir>")
   .option("-w, --watch", "Watch mode", false)
-  .action(async (input, outputDir, args) => {
-    await build(input, outputDir, args);
+  .requiredOption("-o, --outdir <output-dir>", "Output directory", "dist")
+  .requiredOption("--outbase <outbase>", "Output base directory")
+  .argument("<input...>")
+  .action(async (input: string[], options) => {
+    await build(input, options);
   });
 
 program
